@@ -12,6 +12,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
+/* ✅ FIX 1: HOME ROUTE (fixes "Cannot GET /") */
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
+/* ✅ FIX 2: PROPER ENV API KEY */
 const groq = new Groq({
   apiKey: process.env.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
 });
@@ -134,11 +140,14 @@ app.post("/ask", async (req, res) => {
 
     res.json({ reply: completion.choices[0].message.content });
 
-  } catch {
-    res.json({ reply: "❌ Error" });
+  } catch (err) {
+    res.json({ reply: "❌ AI Error or missing API key" });
   }
 });
 
-server.listen(3000, () => {
-  console.log("🚀 Server running on http://localhost:3000");
+/* ✅ FIX 3: RENDER PORT */
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+  console.log("🚀 Server running on port", PORT);
 });
